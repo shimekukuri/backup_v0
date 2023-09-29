@@ -1,14 +1,12 @@
 mod modules;
 
-use modules::Logging::Log::ErrorLog;
-
-use std::fs;
-
-use std::{error::Error, time::SystemTime};
+use modules::hash;
+use modules::io::fs::get_metadata;
+use modules::Logging::ErrorLog;
 
 fn main() {
     let mut er = ErrorLog::new();
-    let path = std::path::Path::new("./Cargo.lock");
+    let path = std::path::Path::new("./Cargo.loc");
     match get_metadata(&path) {
         Ok(x) => {
             x;
@@ -19,17 +17,4 @@ fn main() {
     }
 
     er.write_error_file();
-}
-
-fn get_metadata(path: &std::path::Path) -> Result<SystemTime, Box<dyn std::error::Error>> {
-    let metadata = fs::metadata(&path);
-
-    let k: Result<SystemTime, Box<dyn Error>> = match metadata {
-        Ok(x) => match x.modified() {
-            Ok(y) => Ok(y),
-            Err(e) => Err(Box::new(e)),
-        },
-        Err(e) => Err(Box::new(e)),
-    };
-    k
 }
