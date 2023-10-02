@@ -141,6 +141,18 @@ mod tests {
     pub fn rayon_test() {
         let (tx, rx) = std::sync::mpsc::channel::<DirEntry>();
 
+        let directory_path = "./write_file_test";
+
+        if !fs::metadata(&directory_path).is_ok() {
+            // Create the directory if it doesn't exist
+            if let Err(err) = fs::create_dir(&directory_path) {
+                eprintln!("Error creating directory: {}", err);
+            } else {
+                println!("Directory created: {}", directory_path);
+            }
+        } else {
+            println!("Directory already exists: {}", directory_path);
+        }
         std::thread::spawn(|| {
             let listener = std::net::TcpListener::bind("127.0.0.1:7676").unwrap();
 
@@ -151,9 +163,9 @@ mod tests {
                     match stream.read(&mut buffer) {
                         Ok(n) => {
                             // Process and print the received data
-                            // let request = String::raw(&buffer[..n]);
-                            println!("Received data: {:?}", &buffer[..n]);
 
+                            println!("Received data: {:?}", &buffer[..n]);
+                            std::fs::write("./write_file_test/test", &buffer[..n]).unwrap();
                             // Respond to the client
                             let response = "Hello from the server!\n";
                             stream.write_all(response.as_bytes()).unwrap();
